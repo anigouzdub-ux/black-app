@@ -1,0 +1,30 @@
+name: APK
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: "Sayt manzili"
+        default: "https://u13879.xvest4.ru/Black/"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Loyihani ochish
+        run: |
+          unzip -o android_project.zip -d proj
+          sed -i "s|https://u13879.xvest4.ru/Black/|${{ github.event.inputs.site_url }}|" proj/app/src/main/res/values/strings.xml
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+      - name: APK yigish
+        working-directory: proj
+        run: gradle assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BlackServise-APK
+          path: proj/app/build/outputs/apk/debug/app-debug.apk
